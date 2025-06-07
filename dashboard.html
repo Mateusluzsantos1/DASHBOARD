@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Metas - Contas e Empréstimos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .meta-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .meta-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .meta-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .meta-atual {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #667eea;
+        }
+        
+        .meta-objetivo {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .historico {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .historico h3 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        
+        .historico-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .status-mensal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .status-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .status-numero {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .status-label {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .status-mensal {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard de Metas</h1>
+            <p>Controle suas metas de contas abertas e empréstimos</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Meta de Contas Abertas -->
+            <div class="meta-card">
+                <div class="meta-title">🏦 Contas Abertas</div>
+                <div class="meta-atual" id="contasAtuais">0</div>
+                <div class="meta-objetivo">Meta: 6 contas/mês</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressContas" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="percentualContas">0%</div>
+                
+                <div class="input-section">
+                    <input type="number" class="input-field" id="inputContas" placeholder="Qtd contas" min="1">
+                    <button class="btn" onclick="adicionarContas()">Adicionar</button>
+                </div>
+            </div>
+            
+            <!-- Meta de Empréstimos -->
+            <div class="meta-card">
+                <div class="meta-title">💰 Empréstimos</div>
+                <div class="meta-atual" id="emprestimosAtuais">R$ 0</div>
+                <div class="meta-objetivo">Meta: R$ 1.000.000/mês</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressEmprestimos" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="percentualEmprestimos">0%</div>
+                
+                <div class="input-section">
+                    <input type="number" class="input-field" id="inputEmprestimos" placeholder="Valor R$" min="1">
+                    <button class="btn" onclick="adicionarEmprestimo()">Adicionar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-mensal">
+            <div class="status-card">
+                <div class="status-numero" id="diasRestantes">30</div>
+                <div class="status-label">Dias restantes no mês</div>
+            </div>
+            <div class="status-card">
+                <div class="status-numero" id="mediaContas">0</div>
+                <div class="status-label">Contas/dia necessárias</div>
+            </div>
+        </div>
+        
+        <div class="historico">
+            <h3>📊 Histórico de Hoje</h3>
+            <div id="historicoLista">
+                <div style="text-align: center; color: rgba(255,255,255,0.7);">
+                    Nenhuma atividade registrada hoje
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados salvos permanentemente
+        let dadosAtual = carregarDados();
+        
+        function salvarDados() {
+            // Salva no navegador (persistente)
+            try {
+                localStorage.setItem('dashboardMetas', JSON.stringify(dadosAtual));
+            } catch(e) {
+                // Fallback: salva em cookie se localStorage não estiver disponível
+                document.cookie = `dashboardMetas=${encodeURIComponent(JSON.stringify(dadosAtual))}; expires=Fri, 31 Dec 2025 23:59:59 GMT; path=/`;
+            }
+        }
+        
+        function carregarDados() {
+            try {
+                // Tenta carregar do localStorage primeiro
+                const dados = localStorage.getItem('dashboardMetas');
+                if (dados) {
+                    return JSON.parse(dados);
+                }
+                
+                // Fallback: tenta carregar do cookie
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'dashboardMetas') {
+                        return JSON.parse(decodeURIComponent(value));
+                    }
+                }
+            } catch(e) {
+                console.log('Primeira vez usando o dashboard');
+            }
+            
+            // Dados padrão se não houver nada salvo
+            return {
+                contas: 0,
+                emprestimos: 0,
+                historico: [],
+                mesAtual: new Date().getMonth() + 1,
+                anoAtual: new Date().getFullYear()
+            };
+        }
+        
+        function verificarNovoMes() {
+            const mesAtual = new Date().getMonth() + 1;
+            const anoAtual = new Date().getFullYear();
+            
+            if (dadosAtual.mesAtual !== mesAtual || dadosAtual.anoAtual !== anoAtual) {
+                // Novo mês - resetar dados mas manter histórico do mês anterior
+                const historicoAnterior = {
+                    mes: dadosAtual.mesAtual,
+                    ano: dadosAtual.anoAtual,
+                    contas: dadosAtual.contas,
+                    emprestimos: dadosAtual.emprestimos
+                };
+                
+                dadosAtual = {
+                    contas: 0,
+                    emprestimos: 0,
+                    historico: [],
+                    mesAtual: mesAtual,
+                    anoAtual: anoAtual,
+                    historicoMensal: dadosAtual.historicoMensal ? [...dadosAtual.historicoMensal, historicoAnterior] : [historicoAnterior]
+                };
+                
+                salvarDados();
+                alert(`🎉 Novo mês detectado! Suas metas foram resetadas.\n\nResultado do mês anterior:\n• Contas: ${historicoAnterior.contas}\n• Empréstimos: ${formatarMoeda(historicoAnterior.emprestimos)}`);
+            }
+        }
+        
+        // Metas
+        const META_CONTAS = 6;
+        const META_EMPRESTIMOS = 1000000;
+        
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+        
+        function atualizarDisplay() {
+            // Atualizar contas
+            document.getElementById('contasAtuais').textContent = dadosAtual.contas;
+            const percentualContas = Math.min((dadosAtual.contas / META_CONTAS) * 100, 100);
+            document.getElementById('progressContas').style.width = percentualContas + '%';
+            document.getElementById('percentualContas').textContent = Math.round(percentualContas) + '%';
+            
+            // Atualizar empréstimos
+            document.getElementById('emprestimosAtuais').textContent = formatarMoeda(dadosAtual.emprestimos);
+            const percentualEmprestimos = Math.min((dadosAtual.emprestimos / META_EMPRESTIMOS) * 100, 100);
+            document.getElementById('progressEmprestimos').style.width = percentualEmprestimos + '%';
+            document.getElementById('percentualEmprestimos').textContent = Math.round(percentualEmprestimos) + '%';
+            
+            // Atualizar status mensal
+            const hoje = new Date();
+            const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+            const diasRestantes = ultimoDiaMes - hoje.getDate();
+            document.getElementById('diasRestantes').textContent = diasRestantes;
+            
+            const contasNecessarias = Math.max(0, (META_CONTAS - dadosAtual.contas) / Math.max(1, diasRestantes));
+            document.getElementById('mediaContas').textContent = contasNecessarias.toFixed(1);
+            
+            // Atualizar histórico
+            atualizarHistorico();
+        }
+        
+        function atualizarHistorico() {
+            const lista = document.getElementById('historicoLista');
+            if (dadosAtual.historico.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7);">Nenhuma atividade registrada hoje</div>';
+                return;
+            }
+            
+            const html = dadosAtual.historico.map(item => `
+                <div class="historico-item">
+                    <span>${item.hora} - ${item.tipo}</span>
+                    <span>${item.valor}</span>
+                </div>
+            `).join('');
+            
+            lista.innerHTML = html;
+        }
+        
+        function adicionarContas() {
+            const input = document.getElementById('inputContas');
+            const quantidade = parseInt(input.value);
+            
+            if (quantidade && quantidade > 0) {
+                dadosAtual.contas += quantidade;
+                
+                // Adicionar ao histórico
+                const agora = new Date();
+                dadosAtual.historico.unshift({
+                    hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    tipo: 'Contas Abertas',
+                    valor: `+${quantidade} conta${quantidade > 1 ? 's' : ''}`
+                });
+                
+                // Salvar dados permanentemente
+                salvarDados();
+                
+                input.value = '';
+                atualizarDisplay();
+                
+                // Animação de sucesso
+                const card = input.closest('.meta-card');
+                card.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
+                setTimeout(() => {
+                    card.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
+                }, 1000);
+            }
+        }
+        
+        function adicionarEmprestimo() {
+            const input = document.getElementById('inputEmprestimos');
+            const valor = parseFloat(input.value);
+            
+            if (valor && valor > 0) {
+                dadosAtual.emprestimos += valor;
+                
+                // Adicionar ao histórico
+                const agora = new Date();
+                dadosAtual.historico.unshift({
+                    hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    tipo: 'Empréstimo',
+                    valor: formatarMoeda(valor)
+                });
+                
+                // Salvar dados permanentemente
+                salvarDados();
+                
+                input.value = '';
+                atualizarDisplay();
+                
+                // Animação de sucesso
+                const card = input.closest('.meta-card');
+                card.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
+                setTimeout(() => {
+                    card.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
+                }, 1000);
+            }
+        }
+        
+        // Permitir Enter nos campos de input
+        document.getElementById('inputContas').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarContas();
+            }
+        });
+        
+        document.getElementById('inputEmprestimos').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarEmprestimo();
+            }
+        });
+        
+        // Inicializar - verificar novo mês e carregar dados
+        verificarNovoMes();
+        atualizarDisplay();
+    </script>
+</body>
+</html>
